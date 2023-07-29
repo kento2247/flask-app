@@ -26,7 +26,10 @@
 
    `pip install flask`
 
-6. sqlite3をインストールする
+   - ちゃんとインストールできてるかを確認
+     ```pip list```
+
+7. sqlite3をインストールする
    - [sqlite3.zip](https://github.com/kento2247/flask-app/files/12208010/sqlite3.zip)をダウンロード
    - Cドライブ直下やルートディレクトリなど、普段使わないところに解凍したsqlite3フォルダを置く
    - sqlite3フォルダを右クリックして、「パスをコピー」を押す
