@@ -14,7 +14,8 @@
 
    **もし Python 3.\_*.*と表示されなければ**
 
-   - [pyhon](https://www.python.org/downloads/)をインストールする
+   - Pyhonをインストールする
+     Windows app storeから最新のPythonをインストール
 
    - 再び以下のコマンドを実行して、インストールされているか確認
 
