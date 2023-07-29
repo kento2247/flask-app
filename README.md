@@ -1,5 +1,4 @@
-# flask-app
-
+# セットアップ
 1. [git](https://git-for-windows.github.io/)をインストールする
 
 2. 以下を実行（プログラムをコピー: 初回のみ）
@@ -12,21 +11,22 @@
 
    `python -V`
 
-   **もし Python 3.\_*.*と表示されなければ**
+   - もし Python 3._.__と表示されなければ
 
-   - Pyhonをインストールする
-     
-     Windows app storeから最新のPythonをインストール
-
-   - 再び以下のコマンドを実行して、インストールされているか確認
-
-   `python -V`
+      - Pyhonをインストールする
+        
+        Windows app storeから最新のPythonをインストール
+   
+      - 再び以下のコマンドを実行して、インストールされているか確認
+   
+         ```python -V```
 
 5. Flask をインストールする
 
    `pip install flask`
 
    - ちゃんとインストールできてるかを確認
+     
      ```pip list```
 
 7. sqlite3をインストールする
