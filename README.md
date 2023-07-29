@@ -1,5 +1,4 @@
 # flask-app
-flask app for assignment
 1. [git](https://git-for-windows.github.io/)をインストールする
 
 2. 以下を実行（プログラムをコピー: 初回のみ）
