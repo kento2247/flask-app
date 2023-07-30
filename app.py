@@ -156,7 +156,12 @@ def login():  # ログインページへアクセスがあった時の処理
     if "user_id" in session:  # セッションにuser_idがある場合、ログイン済みなのでホーム画面にリダイレクトする
         return redirect(url_for("home"))
 
-    if request.method == "POST":  # ログインエンドポイントにPOSTリクエストがあった時。すなわちログインボタンが押された場合
+    if request.method == "GET":  # ログインエンドポイントにGETリクエストがあった時。すなわちログインページを表示したい場合
+        return render_template(
+            "login.html", error=None
+        )  # ログイン画面が欲しいというGETリクエストがあった場合、ログイン画面を返す
+
+    elif request.method == "POST":  # ログインエンドポイントにPOSTリクエストがあった時。すなわちログインボタンが押された場合
         username = request.form["username"]  # フォームの内容を取得する
         password = request.form["password"]  # フォームの内容を取得する
         h = hashlib.md5(password.encode())  # パスワードは平文ではなくハッシュ値で暗号化する
@@ -172,10 +177,6 @@ def login():  # ログインページへアクセスがあった時の処理
             session["user_id"] = username  # ユーザ認証された場合、セッションに記録する
             flash("Logged in")  # flashメッセージを設定する（簡易的なポップアップ通知）
             return redirect(url_for("home"))  # ホーム画面に戻る
-    elif request.method == "GET":
-        return render_template(
-            "login.html", error=None
-        )  # ログイン画面が欲しいというGETリクエストがあった場合、ログイン画面を返す
 
 
 @app.route(
@@ -183,7 +184,11 @@ def login():  # ログインページへアクセスがあった時の処理
 )  # サインアップエンドポイント。GET=サインアップページを表示。POST=サインアップ処理
 def signup():  # ユーザー登録のためのページ
     request_valid = True  # フォームの内容を取得し、バリデーションを行うためのフラグ
-    if request.method == "POST":  # ユーザー登録ボタンが押された場合
+
+    if request.method == "GET":  # サインアップエンドポイントにGETリクエストがあった時。すなわちサインアップページを表示したい場合
+        return render_template("signup.html")  # GETリクエストがあった場合、サインアップ画面を返す
+
+    elif request.method == "POST":  # ユーザー登録ボタンが押された場合
         username = request.form["username"]  # フォームの内容を取得する
         password = request.form["password"]  # フォームの内容を取得する
         confirm = request.form["confirm"]  # フォームの内容を取得する
@@ -211,15 +216,16 @@ def signup():  # ユーザー登録のためのページ
                 }  # 登録する内容をまとめる
                 db_insert("USERS", data_obj)  # データベースにユーザー情報を追加する
                 return redirect(url_for("login"))  # ログインページにリダイレクトする
-    elif request.method == "GET":
-        return render_template("signup.html")  # GETリクエストがあった場合、サインアップ画面を返す
+
+        else:  # フォームの入力に問題があった場合
+            return render_template("signup.html")
 
 
 @app.route("/logout")  # ログアウトエンドポイント。リクエストの種類に関わらずログアウト処理を行う
 def logout():  # ログアウト処理
     if session.pop("user_id", None):  # セッションからユーザーIDを削除する
         flash("ログアウトしました")  # flashメッセージを設定する（簡易的なポップアップ通知）
-    return redirect(url_for("home"))  # ログアウト後はホームにリダイレクトする
+    return redirect(url_for("home"))  # ログアウト後はホームにリダイレクトする。
 
 
 @app.route("/game", methods=["GET"])  # ゲームエンドポイント。GET=ゲーム画面を表示
