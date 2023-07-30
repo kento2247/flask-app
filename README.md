@@ -36,7 +36,7 @@
    - 「設定」→「検索」→「環境変数」→「ユーザー環境変数 / PATH」→「編集」→「追加」
    - 2個前でコピーしたパスをペーストして保存
 
-8. レポート
+# レポート
    - [Wordの共有リンク](https://keiojp0-my.sharepoint.com/:w:/g/personal/tkento1985_keio_jp/EXIAmY-0t0VHnbNWCRw3hiIBHRZvS4HxlJbRcCiK9xUU2A?e=nSaDIr)
      > もしブラウザでwordが立ち上がってしまう場合
      > 1. ブラウザ内でofficeアカウントにログインする
@@ -47,7 +47,7 @@
 
 
 
-9. to-do
+# to-do
    - [x] 終わったらこれみたいに[ ]の中にxを入れる！
    - [ ] layout.htmlのtitleを変える
    - [ ] home.htmlのtitleを変える
