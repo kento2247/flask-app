@@ -42,6 +42,7 @@
 
 
 9. to-do
+   - [x] 終わったらこれみたいに[ ]の中にxを入れる！
    - [ ] layout.htmlのtitleを変える
    - [ ] home.htmlのtitleを変える
    - [ ] home.htmlのコンテンツを編集する
