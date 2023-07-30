@@ -8,9 +8,15 @@ from flask import Flask, flash, g, jsonify, render_template, request, session, u
 
 DATABASE = "sample.db"  # データベースファイルの名前を指定
 app = Flask(__name__, static_folder="./static")  # Flaskのインスタンスを作成
-app.config["SECRET_KEY"] = "72224660711"  # port保護のためのキー
+app.config["SECRET_KEY"] = "72224660711"  # port保護のためのキー。何でもいい
 
 
+# データベース操作のための関数
+# get_db: データベースへ接続する
+# db_insert: データベースにデータを挿入する
+# db_delete: データベースからデータを削除する
+# db_get_json: データベースからデータを取得する
+# db_update: データベースのデータを更新する
 def get_db():  # DATABASEへ接続する
     db = getattr(g, "_database", None)
     if db is None:
@@ -104,7 +110,14 @@ def db_update(table, value, where):  # データベースのデータを更新�
         return False
 
 
-@app.before_request
+@app.teardown_appcontext  # 特殊なエンドポイント。アプリ終了時に実行される
+def close_connection(exception):  # アプリ終了時にデータベース接続を閉じる
+    db = getattr(g, "_database", None)
+    if db is not None:
+        db.close()
+
+
+@app.before_request  # 特殊なエンドポイント。リクエストのたびに実行される
 def before_request():  # リクエストのたびにセッションの寿命を更新する
     # 15分間操作がないと移動でログアウトする
     session.permanent = True
@@ -112,14 +125,7 @@ def before_request():  # リクエストのたびにセッションの寿命を�
     session.modified = True
 
 
-@app.teardown_appcontext
-def close_connection(exception):  # アプリ終了時にデータベース接続を閉じる
-    db = getattr(g, "_database", None)
-    if db is not None:
-        db.close()
-
-
-@app.route("/")  # ルートエンドポイント
+@app.route("/")  # ルートエンドポイント。adminユーザーの作成をし、ホーム画面を返す
 def home():  # 最初URLでアクセスされた時の処理
     result = db_get_json(
         "", f'SELECT * FROM USERS u WHERE u.username="{"admin"}"'
@@ -138,11 +144,12 @@ def home():  # 最初URLでアクセスされた時の処理
     return render_template("home.html", username=result[0]["username"])
 
 
-@app.route("/login", methods=["GET", "POST"])  # ログインエンドポイント。GETとPOSTの両方を許可する
+@app.route(
+    "/login", methods=["GET", "POST"]
+)  # ログインエンドポイント。GET=ログインページを返す。POST=ログイン処理を行う
 def login():  # ログインページへアクセスがあった時の処理
     if "user_id" in session:  # セッションにuser_idがある場合、ログイン済みなのでホーム画面にリダイレクトする
         return redirect(url_for("home"))
-    error = None
 
     if request.method == "POST":  # ログインエンドポイントにPOSTリクエストがあった時。すなわちログインボタンが押された場合
         username = request.form["username"]  # フォームの内容を取得する
@@ -151,17 +158,24 @@ def login():  # ログインページへアクセスがあった時の処理
         result = db_get_json(
             "",
             f"SELECT * FROM USERS WHERE username = '{username}' AND password = '{h.hexdigest()}''",
-        )
-        if result == []:
-            error = "Invalid username or password"  # ユーザ認証されなかった場合、エラーメッセージをレンダリングする。
-        else:
+        )  # ユーザー名とパスワードが一致するデータがデータベースにあるかを確認
+        if result == []:  # データベースに無かった場合
+            return render_template(
+                "login.html", error="Invalid username or password"
+            )  # ログイン失敗。エラーメッセージと共にログイン画面へ戻る
+        else:  # データベースにあった場合
             session["user_id"] = username  # ユーザ認証された場合、セッションに記録する
             flash("Logged in")  # flashメッセージを設定する（簡易的なポップアップ通知）
             return redirect(url_for("home"))  # ホーム画面に戻る
-    return render_template("login.html", error=error)  # ログイン失敗。エラーメッセージと共にログイン画面へ戻る
+    elif request.method == "GET":
+        return render_template(
+            "login.html", error=None
+        )  # ログイン画面が欲しいというGETリクエストがあった場合、ログイン画面を返す
 
 
-@app.route("/signup", methods=["GET", "POST"])  # サインアップエンドポイント。GETとPOSTの両方を許可する
+@app.route(
+    "/signup", methods=["GET", "POST"]
+)  # サインアップエンドポイント。GET=サインアップページを表示。POST=サインアップ処理
 def signup():  # ユーザー登録のためのページ
     request_valid = True  # フォームの内容を取得し、バリデーションを行うためのフラグ
     if request.method == "POST":  # ユーザー登録ボタンが押された場合
@@ -191,24 +205,25 @@ def signup():  # ユーザー登録のためのページ
                 }  # 登録する内容をまとめる
                 db_insert("USERS", data_obj)  # データベースにユーザー情報を追加する
                 return redirect(url_for("login"))  # ログインページにリダイレクトする
-    return render_template("signup.html")
+    elif request.method == "GET":
+        return render_template("signup.html")  # GETリクエストがあった場合、サインアップ画面を返す
 
 
-@app.route("/logout")  # ログアウトエンドポイント。GETとPOSTの両方を許可する
+@app.route("/logout")  # ログアウトエンドポイント。リクエストの種類に関わらずログアウト処理を行う
 def logout():  # ログアウト処理
     if session.pop("user_id", None):  # セッションからユーザーIDを削除する
         flash("ログアウトしました")  # flashメッセージを設定する（簡易的なポップアップ通知）
     return redirect(url_for("home"))  # ログアウト後はホームにリダイレクトする
 
 
-@app.route("/game", methods=["GET"])  # ゲームエンドポイント。GETとPOSTの両方を許可する
+@app.route("/game", methods=["GET"])  # ゲームエンドポイント。GET=ゲーム画面を表示
 def game():  # ゲーム画面の表示
     if "user_id" not in session:  # ログインしていない場合
         return redirect(url_for("login"))  # ログイン画面に移動する
     return render_template("game.html", form={})  # (GETリクエストの場合)ゲーム画面を表示する
 
 
-@app.route("/save_escape_time", methods=["POST"])  # ゲームデータをセーブするエンドポイント。POSTを許可する
+@app.route("/save_escape_time", methods=["POST"])  # ゲームデータをセーブするエンドポイント。POST=ゲームデータを記録
 def save_escape_time():  # ゲームデータをセーブする処理
     data = request.json  # postされたデータ(json)を取得
     escape_time = data["escapeTime"]  # ゲームの逃れた時間を取得
@@ -256,11 +271,12 @@ def save_escape_time():  # ゲームデータをセーブする処理
         )  # JavaScriptに結果を返す
 
 
-@app.route("/vote", methods=["GET", "POST"])  # 投票エンドポイント。GETとPOSTの両方を許可する
+@app.route("/vote", methods=["GET", "POST"])  # 投票エンドポイント。GET=投票ページを返す。POST=投票処理を行う
 def vote():  # 投票画面の表示と、投票処理
     if "user_id" not in session:  # ログインしていない場合
         return redirect(url_for("login"))  # ログイン画面に移動する
 
+    # グラフ描画用のデータをデータベースから取得する
     labels = ""  # グラフのラベル
     values = ""  # グラフの値
     result = db_get_json("VOTES", "")  # データベースから投票結果を取得
@@ -271,13 +287,12 @@ def vote():  # 投票画面の表示と、投票処理
         labels += f"{title},"  # グラフのラベルに追加
         values += f"{num},"  # グラフの値に追加
         vote_values[title] = num  # 辞書に追加
-
     labels = labels[:-1]  # 最後のカンマを削除
     values = values[:-1]  # 最後のカンマを削除
     graph_data = {  # グラフ表示用のデータ。JavaScriptに送るために整形している
         "chart_labels": labels,
         "chart_data": values,
-        "chart_title": "OS集計",
+        "chart_title": "",
         "chart_target": "",
     }
 
@@ -291,7 +306,7 @@ def vote():  # 投票画面の表示と、投票処理
         )  # 選択された投票項目の投票数を1増やす
 
         return redirect(url_for("vote"))  # voteエンドポイントにGETリダイレクトする(こうすることで画面の再描画が楽に行える)
-    else:  # GET。投票画面を表示するだけ
+    elif request.method == "GET":  # GET。投票画面を表示するだけ
         return render_template(
             "vote.html", form={}, graph_data=graph_data
         )  # グラフ表示用のデータとともに投票ページを表示する
