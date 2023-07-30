@@ -40,18 +40,20 @@
    - 「設定」→「検索」→「環境変数」→「ユーザー環境変数 / PATH」→「編集」→「追加」
    - 2個前でコピーしたパスをペーストして保存
 
-＃最新のプログラムが欲しい場合
+# 最新のプログラムが欲しい場合
    1. `cd ~/Downloads`
    2. `cd ./flask-app/`
    3. `git pull`
    
-   を実行する。もしエラーが起きたら
+   を実行する。
+   - もしエラーが起きたら
 
-   `git stash`
-
-   を実行してみる。何回かyを入力しないといけないはず。
+      `git stash`
    
-   それでも無理だったらフォルダアプリから、C: Downloadsに移動して、flask-appフォルダを消す！
+      を実行してみる。
+   - 何回かyを入力しないといけないはず。
+   
+      それでも無理だったらフォルダアプリから、C: Downloadsに移動して、flask-appフォルダを消す！
    
 # レポート
    - [Wordの共有リンク](https://keiojp0-my.sharepoint.com/:w:/g/personal/tkento1985_keio_jp/EXIAmY-0t0VHnbNWCRw3hiIBHRZvS4HxlJbRcCiK9xUU2A?e=nSaDIr)
