@@ -38,6 +38,11 @@
 
 8. レポート
    - [Wordの共有リンク](https://keiojp0-my.sharepoint.com/:w:/g/personal/tkento1985_keio_jp/EXIAmY-0t0VHnbNWCRw3hiIBHRZvS4HxlJbRcCiK9xUU2A?e=nSaDIr)
+     > もしブラウザでwordが立ち上がってしまう場合
+     > 1. ブラウザ内でofficeアカウントにログインする
+     > 2. ログイン後は「編集」ボタンを押すと、「デスクトップアプリで開く」ボタンが表示されるはず!
+     > <img width="1280" alt="image" src="https://github.com/kento2247/flask-app/assets/42343541/bcaa0910-0676-4ecd-825e-ab14f8f2e645">
+
    - [手書きの説明.pdf](https://github.com/kento2247/flask-app/files/12209227/default.pdf)
 
 
