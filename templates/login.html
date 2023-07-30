@@ -27,9 +27,12 @@
                 <input class="input" type="password" name="password" placeholder="********">
             </div>
         </div>
-        <button class="button is-primary">ログイン</button>
-        <a class="button is-primary is-light" href="{{url_for('signup')}}">サインアップ</a>
-        <a class="button " href="{{url_for('logout')}}">キャンセル</a>
+
+        <div class="has-text-centered">
+            <button class="button is-primary">ログイン</button>
+            <a class="button is-success is-light" href="{{url_for('signup')}}">サインアップ</a>
+            <a class="button " href="{{url_for('logout')}}">キャンセル</a>
+        </div>
     </form>
 </div>
 {% endblock %}
