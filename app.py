@@ -1,9 +1,6 @@
-import datetime
+import base64
 import hashlib
-import os
 import sqlite3
-import uuid
-from dataclasses import dataclass
 from datetime import timedelta
 
 from flask import Flask, flash, g, redirect, render_template, request, session, url_for
@@ -88,6 +85,20 @@ def db_get_json(table, query):
             temp_obj[keys[index]] = val
         return_json.append(temp_obj)
     return return_json
+
+
+def db_update(table, value, where):
+    conn = get_db()
+    cur = conn.cursor()
+    query_str = f"UPDATE {table} SET {value} WHERE {where}"
+    try:
+        cur.execute(query_str)
+        conn.commit()  ## 更新はcommitが必要
+        return True
+    except sqlite3.Error as e:
+        print("sqlite3.Error occurred:", e.args[0])
+        conn.commit()  ## 更新はcommitが必要
+        return False
 
 
 @app.teardown_appcontext
@@ -179,6 +190,77 @@ def logout():
     if session.pop("user_id", None):
         flash("ログアウトしました")
     return redirect(url_for("home"))  # ログアウト後はホームにリダイレクトする
+
+
+@app.route("/game", methods=["GET", "POST"])
+def game():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        # request_valid = True
+        # selected = request.form["button"]
+        # if selected == "resist_store":
+        #     return redirect(url_for("resist_store"))
+        # elif selected == "resist_user":
+        #     return redirect(url_for("resist_user"))
+        # elif selected == "resist_transaction":
+        #     return redirect(url_for("resist_transaction"))
+        # elif selected == "show_user":
+        #     return redirect(url_for("show_user"))
+        # elif selected == "delete_user":
+        #     return redirect(url_for("delete_user"))
+        # elif selected == "delete_store":
+        #     return redirect(url_for("delete_store"))
+        # elif selected == "delete_transaction":
+        #     return redirect(url_for("delete_transaction"))
+        # else:
+        # return render_template("select_edit.html", form={})
+        return render_template("game.html", form={})
+    else:  # GET
+        return render_template("game.html", form={})
+
+
+@app.route("/vote", methods=["GET", "POST"])
+def vote():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    labels = ""
+    values = ""
+    result = db_get_json("VOTES", "")
+    vote_values = {}
+    for i in result:
+        title = i["title"]
+        num = int(i["num"])
+        labels += f"{title},"
+        values += f"{num},"
+        vote_values[title] = num
+    labels = labels[:-1]  # 最後のカンマを削除
+    values = values[:-1]  # 最後のカンマを削除
+    graph_data = {
+        "chart_labels": labels,
+        "chart_data": values,
+        "chart_title": "OS集計",
+        "chart_target": "",
+    }
+
+    if request.method == "POST":
+        selected = request.form["vote"]
+        if selected == "Mac OS":
+            # return redirect(url_for("resist_store"))
+            print("mac os")
+        elif selected == "Windows":
+            # return redirect(url_for("resist_user"))
+            print("windows")
+        elif selected == "Linux":
+            # return redirect(url_for("resist_transaction"))
+            print("linux")
+        db_update("VOTES", f"num={vote_values[selected]+1}", f"title='{selected}'")
+
+        return redirect(url_for("vote"))
+    else:  # GET
+        return render_template("vote.html", form={}, graph_data=graph_data)
 
 
 if __name__ == "__main__":

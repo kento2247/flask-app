@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<!-- flashメッセージを表示させる -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div id="announce" class="notification is-primary">
+    <button class="delete"></button>
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endwith %}
+
+<section class="hero is-fullheight">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <div class="columns is-8 is-variable ">
+                hello world!
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $("#announce").delay(2000).slideUp();
+</script>
+{% endblock %}

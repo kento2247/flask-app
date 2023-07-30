@@ -48,16 +48,27 @@
             <!-- メニュー部分 -->
             <div id="navbarMenu" class="navbar-menu">
                 <div class="navbar-end">
-                    <a class="navbar-item is-active" href="{{url_for('home')}}">
+                    <a class="navbar-item" href="{{url_for('home')}}">
                         <i class="fas fa-home"></i>&nbsp;
                         ホーム
                     </a>
                     <!-- ログイン状況に応じて項目を変化 -->
                     {% if session['user_id'] %}
+                    <a class="navbar-item" href="{{url_for('game')}}">
+                        <i class="fa fa-spinner" aria-hidden="true"></i>&nbsp;
+                        ゲーム
+                    </a>
+
+                    <a class="navbar-item" href="{{url_for('vote')}}">
+                        <i class="fa fa-inbox" aria-hidden="true"></i>&nbsp;
+                        投票
+                    </a>
+
                     <a class="navbar-item" href="{{url_for('logout')}}">
                         <i class="fa fa-angle-double-left" aria-hidden="true"></i>&nbsp;
                         ログアウト
                     </a>
+
                     {% else %}
                     <a class="navbar-item" href="{{url_for('login')}}">
                         <i class="fa fa-angle-double-right" aria-hidden="true"></i>&nbsp;
