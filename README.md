@@ -35,3 +35,15 @@
    - sqlite3フォルダを右クリックして、「パスをコピー」を押す
    - 「設定」→「検索」→「環境変数」→「ユーザー環境変数 / PATH」→「編集」→「追加」
    - 2個前でコピーしたパスをペーストして保存
+
+8. レポート
+   - [Wordの共有リンク](https://keiojp0-my.sharepoint.com/:w:/g/personal/tkento1985_keio_jp/EXIAmY-0t0VHnbNWCRw3hiIBHRZvS4HxlJbRcCiK9xUU2A?e=nSaDIr)
+   - [手書きの説明.pdf](https://github.com/kento2247/flask-app/files/12209227/default.pdf)
+
+
+9. to-do
+   - [ ] layout.htmlのtitleを変える
+   - [ ] home.htmlのtitleを変える
+   - [ ] home.htmlのコンテンツを編集する
+   - [ ] voteの内容を変える
+   - [ ] voteのアイコンを変える
