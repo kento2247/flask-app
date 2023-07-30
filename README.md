@@ -1,11 +1,13 @@
 # セットアップ
 1. [git](https://git-for-windows.github.io/)をインストールする
 
-2. 以下を実行（プログラムをコピー: 初回のみ）
+2. 以下を実行（プログラムをコピー: 初回のみ）+VScodeで開く
    
    `cd ~/Downloads`
    
    `git clone https://github.com/kento2247/flask-app.git`
+
+   `code ./flask-app/`
 
 4. [VScode](https://code.visualstudio.com/)がインストールされていなければ、インストールする
 
