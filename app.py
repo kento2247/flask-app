@@ -3,7 +3,17 @@ import hashlib
 import sqlite3
 from datetime import timedelta
 
-from flask import Flask, flash, g, redirect, render_template, request, session, url_for
+from flask import (
+    Flask,
+    flash,
+    g,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 DATABASE = "sample.db"  # データベースファイルの名前を指定
 app = Flask(__name__, static_folder="./static")
@@ -44,7 +54,7 @@ def db_insert(table, data_obj):  # data={key:value}
         conn.commit()  ## 更新はcommitが必要
         return True
     except sqlite3.Error as e:
-        print("sqlite3.Error occurred:", e.args[0])
+        print("sqlite3.Error occurred at insert:", e.args[0])
         conn.commit()  ## 更新はcommitが必要
         return False
 
@@ -58,7 +68,7 @@ def db_delete(table, where):
         conn.commit()  ## 更新はcommitが必要
         return True
     except sqlite3.Error as e:
-        print("sqlite3.Error occurred:", e.args[0])
+        print("sqlite3.Error occurred at delete:", e.args[0])
         conn.commit()  ## 更新はcommitが必要
         return False
 
@@ -74,7 +84,7 @@ def db_get_json(table, query):
         records = cur.execute(query_str)
     except sqlite3.Error as e:
         print("doing query is: " + query)
-        print("sqlite3.Error occurred:", e.args[0])
+        print("sqlite3.Error occurred at get:", e.args[0])
         return {}
     keys = []
     for num, record in enumerate(records):
@@ -91,12 +101,13 @@ def db_update(table, value, where):
     conn = get_db()
     cur = conn.cursor()
     query_str = f"UPDATE {table} SET {value} WHERE {where}"
+    # print(query_str)
     try:
         cur.execute(query_str)
         conn.commit()  ## 更新はcommitが必要
         return True
     except sqlite3.Error as e:
-        print("sqlite3.Error occurred:", e.args[0])
+        print("sqlite3.Error occurred at update:", e.args[0])
         conn.commit()  ## 更新はcommitが必要
         return False
 
@@ -199,9 +210,47 @@ def game():
 
     if request.method == "POST":
         # ゲーム処理
+        print(request.form)
         return render_template("game.html", form={})
     else:  # GET
         return render_template("game.html", form={})
+
+
+@app.route("/save_escape_time", methods=["POST"])
+def save_escape_time():
+    data = request.json
+    escape_time = data["escapeTime"]  # ゲームの逃れた時間を取得
+    # ここで逃れた時間をデータベースに保存したり、処理したりする
+    # print("ユーザー名", session["user_id"])
+    # print("逃れた時間:", escape_time)
+    history = db_get_json("GAMELOGS", "")
+
+    # print(history)
+    if history == []:
+        db_insert("GAMELOGS", {"username": session["user_id"], "time": escape_time})
+        history.append({"username": session["user_id"], "time": escape_time})
+        return jsonify({"message": "insert: 逃れた時間を受け取りました。", "json": history})
+    else:
+        for i in history:
+            if i["username"] == session["user_id"]:
+                if float(i["time"]) < float(escape_time):
+                    db_update(
+                        "GAMELOGS",
+                        "time=" + str(escape_time),
+                        f'username="{session["user_id"]}"',
+                    )
+                    i["time"] = escape_time
+                    return jsonify(
+                        {
+                            "message": "update: 逃れた時間を受け取りました。",
+                            "json": history,
+                        }
+                    )
+                else:
+                    return jsonify({"message": "none: 逃れた時間を受け取りました。", "json": history})
+        db_insert("GAMELOGS", {"username": session["user_id"], "time": escape_time})
+        history.append({"username": session["user_id"], "time": escape_time})
+        return jsonify({"insert: message": "逃れた時間を受け取りました。", "json": history})
 
 
 @app.route("/vote", methods=["GET", "POST"])
