@@ -201,7 +201,11 @@ def signup():  # ユーザー登録のためのページ
         if password != confirm:  # パスワードと確認用のパスワードが一致しない場合、エラーメッセージを表示する
             flash("確認用のパスワードが一致しません")
             request_valid = False
-        if request_valid:  # フォームの入力に問題がなかった場合
+
+        if request_valid == False:  # フォームの入力に問題があった場合
+            return render_template("signup.html")
+
+        else:  # フォームの入力に問題がなかった場合
             result = db_get_json(
                 "", f"SELECT * FROM USERS u WHERE u.username='{username}'"
             )  # USERSテーブルから、usernameが一致するユーザーを取得する
@@ -216,9 +220,6 @@ def signup():  # ユーザー登録のためのページ
                 }  # 登録する内容をまとめる
                 db_insert("USERS", data_obj)  # データベースにユーザー情報を追加する
                 return redirect(url_for("login"))  # ログインページにリダイレクトする
-
-        else:  # フォームの入力に問題があった場合
-            return render_template("signup.html")
 
 
 @app.route("/logout")  # ログアウトエンドポイント。リクエストの種類に関わらずログアウト処理を行う
