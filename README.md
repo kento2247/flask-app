@@ -43,7 +43,8 @@
      > 2. ログイン後は「編集」ボタンを押すと、「デスクトップアプリで開く」ボタンが表示されるはず!
      > <img width="1280" alt="image" src="https://github.com/kento2247/flask-app/assets/42343541/bcaa0910-0676-4ecd-825e-ab14f8f2e645">
 
-   - [手書きの説明.pdf](https://github.com/kento2247/flask-app/files/12209227/default.pdf)
+   - [手書きの説明.pdf](https://github.com/kento2247/flask-app/files/12209317/default.pdf)
+
 
 
 9. to-do
