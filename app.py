@@ -137,11 +137,15 @@ def home():  # 最初URLでアクセスされた時の処理
 
     if "user_id" not in session:  # セッションにuser_idがない場合、未ログインなのでusernameを渡さずにHTMLをレンダリング
         return render_template("home.html")
-    result = db_get_json(
-        "", f'SELECT * FROM USERS u WHERE u.username="{session["user_id"]}"'
-    )  # adminユーザーが登録されているか確認する
-    print(result)
-    return render_template("home.html", username=result[0]["username"])
+    else:  # セッションにuser_idがある場合、ログイン済みなのでusernameを渡してHTMLをレンダリング
+        result = db_get_json(
+            "", f'SELECT * FROM USERS u WHERE u.username="{session["user_id"]}"'
+        )  # sessionにいるユーザーが本当に登録されているか確認する
+        if result == []:  # sessionにいるユーザーが登録されていない場合、セッションを削除して未ログイン状態にする
+            session.pop("user_id", None)  # セッションからuser_idを削除する
+            return render_template("home.html")
+        else:  # sessionにいるユーザーが登録されている場合、ホーム画面を返す
+            return render_template("home.html", username=session["user_id"])
 
 
 @app.route(
@@ -197,6 +201,7 @@ def signup():  # ユーザー登録のためのページ
             )  # USERSテーブルから、usernameが一致するユーザーを取得する
             if result != []:  # 検索結果がヒットした場合。すなわち既に同じユーザー名が登録されている場合、エラーメッセージを表示する
                 flash("This username is already taken")
+                return render_template("signup.html")  # サインアップできなかったので、サインアップ画面を返す
             else:  # 検索結果がヒットしなかった場合。すなわち入力されたユーザー名が登録されていない場合
                 h = hashlib.md5(password.encode())  # パスワードは平文ではなくハッシュ値で暗号化する
                 data_obj = {
