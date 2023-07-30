@@ -128,7 +128,7 @@ def before_request():  # リクエストのたびにセッションの寿命を�
 @app.route("/")  # ルートエンドポイント。adminユーザーの作成をし、ホーム画面を返す
 def home():  # 最初URLでアクセスされた時の処理
     result = db_get_json(
-        "", f'SELECT * FROM USERS u WHERE u.username="{"admin"}"'
+        "", f"SELECT * FROM USERS u WHERE u.username='admin'"
     )  # adminユーザーが登録されているか確認する
     if result == []:  # adminユーザーが登録されていない場合、登録する
         h = hashlib.md5("admin".encode())  # パスワードは平文ではなくハッシュ値で暗号化する
@@ -138,8 +138,9 @@ def home():  # 最初URLでアクセスされた時の処理
     if "user_id" not in session:  # セッションにuser_idがない場合、未ログインなのでusernameを渡さずにHTMLをレンダリング
         return render_template("home.html")
     else:  # セッションにuser_idがある場合、ログイン済みなのでusernameを渡してHTMLをレンダリング
+        user_name_in_session = session["user_id"]
         result = db_get_json(
-            "", f'SELECT * FROM USERS u WHERE u.username="{session["user_id"]}"'
+            "", f"SELECT * FROM USERS u WHERE u.username='{user_name_in_session}'"
         )  # sessionにいるユーザーが本当に登録されているか確認する
         if result == []:  # sessionにいるユーザーが登録されていない場合、セッションを削除して未ログイン状態にする
             session.pop("user_id", None)  # セッションからuser_idを削除する
@@ -161,7 +162,7 @@ def login():  # ログインページへアクセスがあった時の処理
         h = hashlib.md5(password.encode())  # パスワードは平文ではなくハッシュ値で暗号化する
         result = db_get_json(
             "",
-            f"SELECT * FROM USERS WHERE username = '{username}' AND password = '{h.hexdigest()}''",
+            f"SELECT * FROM USERS WHERE username = '{username}' AND password = '{h.hexdigest()}'",
         )  # ユーザー名とパスワードが一致するデータがデータベースにあるかを確認
         if result == []:  # データベースに無かった場合
             return render_template(
@@ -197,7 +198,7 @@ def signup():  # ユーザー登録のためのページ
             request_valid = False
         if request_valid:  # フォームの入力に問題がなかった場合
             result = db_get_json(
-                "", f'SELECT * FROM USERS u WHERE u.username="{username}"'
+                "", f"SELECT * FROM USERS u WHERE u.username='{username}'"
             )  # USERSテーブルから、usernameが一致するユーザーを取得する
             if result != []:  # 検索結果がヒットした場合。すなわち既に同じユーザー名が登録されている場合、エラーメッセージを表示する
                 flash("This username is already taken")
@@ -248,10 +249,11 @@ def save_escape_time():  # ゲームデータをセーブする処理
         for i in history:  # それぞれの履歴を確認する
             if i["username"] == session["user_id"]:  # ログイン中のユーザーと同じユーザー名の履歴がある場合
                 if float(i["time"]) < float(escape_time):  # 履歴にある逃れた時間が、新しい結果より短い場合
+                    user_name_in_session = session["user_id"]  # ログイン中のユーザー名を取得
                     db_update(
                         "GAMELOGS",
                         "time=" + str(escape_time),
-                        f'username="{session["user_id"]}"',
+                        f"username='{user_name_in_session}'",
                     )  # データベースの履歴をいい結果の方へ更新する
                     i["time"] = escape_time  # JavaScriptに返す用にhistoryを更新
                     return jsonify(
