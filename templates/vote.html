@@ -11,55 +11,143 @@
 </div>
 {% endif %} {% endwith %}
 
-<form class="box" method="POST">
-  <section class="hero is-fullheight">
-    <div class="hero-body">
-      <div class="container has-text-centered">
-        <div class="columns is-8 is-variable">
-          <div class="column is-half has-text-left">
-            <div class="has-text-centered">
-              <h1 class="title is-2">OS何使ってますか？</h1>
-            </div>
-            <div class="container">
-              <div class="container">
-                <div class="row my-4">
-                  <canvas id="myChart"></canvas>
-                </div>
-                <input type="hidden" id="chart_labels" name="chart_labels" value="{{ graph_data.chart_labels }}" />
-                <input type="hidden" id="chart_title" name="chart_title" value="{{ graph_data.chart_title }}" />
-                <input type="hidden" id="chart_target" name="chart_target" value="{{ graph_data.chart_target }}" />
-                <input type="hidden" id="chart_data" name="chart_data" value="{{ graph_data.chart_data }}" />
-              </div>
-              <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-              <script type="text/javascript" src="static/js/graph.js"></script>
-            </div>
+<section class="hero is-fullheight">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <div class="columns is-8 is-variable">
+
+        <div class="column is-half">
+          <div class="has-text-centered">
+            <h1 class="title is-2">OS何使ってますか？</h1>
           </div>
-          <div class="column is-half has-text-left">
-            <form action="{{url_for('vote')}}" method="POST" enctype="multipart/form-data">
-              <div class="field">
-                <button class="button is-link" type="submit" name="vote" value="Mac OS">
-                  Mac OS
-                </button>
-                <br />
+          <div class="container">
+            <div class="container">
+              <div class="row my-4">
+                <canvas id="myChart"></canvas>
               </div>
-              <div class="field">
-                <button class="button is-link" type="submit" name="vote" value="Windows">
-                  Windows
-                </button>
-                <br />
-              </div>
-              <div class="field">
-                <button class="button is-link" type="submit" name="vote" value="Linux">
-                  Linux
-                </button>
-              </div>
-            </form>
+              <input type="hidden" id="chart_labels" name="chart_labels" value="{{ graph_data.chart_labels }}" />
+              <input type="hidden" id="chart_title" name="chart_title" value="{{ graph_data.chart_title }}" />
+              <input type="hidden" id="chart_target" name="chart_target" value="{{ graph_data.chart_target }}" />
+              <input type="hidden" id="chart_data" name="chart_data" value="{{ graph_data.chart_data }}" />
+            </div>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+            <script type="text/javascript" src="static/js/graph.js"></script>
           </div>
         </div>
+
+        <div class="column is-half">
+          <form action="{{url_for('vote')}}" method="POST" enctype="multipart/form-data">
+
+            <div class="list has-visible-pointer-controls">
+              <div class="list-item">
+                <div class="columns is-vcentered">
+
+                  <div class="column is-narrow">
+                    <div class="list-item-image">
+                      <figure class="image is-64x64">
+                        <img class="is-rounded" src="https://img.freepik.com/free-icon/mac-os_318-10374.jpg">
+                      </figure>
+                    </div>
+                  </div>
+
+                  <div class="column">
+                    <div class="list-item-content">
+                      <div class="list-item-title">Mac OS</div>
+                      <div class="list-item-description">Apple Inc.</div>
+                    </div>
+                  </div>
+
+                  <div class="column is-narrow">
+                    <div class="list-item-controls">
+                      <div class="buttons is-right">
+                        <button class="button" type="submit" name="vote" value="Mac OS">
+                          <span class="icon is-small">
+                            <i class="fas fa-edit"></i>
+                          </span>
+                          <span>投票</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+              <hr class="divider">
+
+              <div class="list-item">
+                <div class="columns is-vcentered">
+                  <div class="column is-narrow">
+                    <div class="list-item-image">
+                      <figure class="image is-64x64">
+                        <img class="is-rounded"
+                          src="https://cdn.pixabay.com/photo/2018/05/08/21/29/windows-3384024_1280.png">
+                      </figure>
+                    </div>
+                  </div>
+
+                  <div class="column">
+                    <div class="list-item-content">
+                      <div class="list-item-title">Windows</div>
+                      <div class="list-item-description">Microsoft Corporation</div>
+                    </div>
+                  </div>
+
+                  <div class="column is-narrow">
+                    <div class="list-item-controls">
+                      <div class="buttons is-right">
+                        <button class="button" type="submit" name="vote" value="Windows">
+                          <span class="icon is-small">
+                            <i class="fas fa-edit"></i>
+                          </span>
+                          <span>投票</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <hr class="divider">
+
+              <div class="list-item">
+                <div class="columns is-vcentered">
+                  <div class="column is-narrow">
+                    <div class="list-item-image">
+                      <figure class="image is-64x64">
+                        <img class="is-rounded"
+                          src="https://cdn.icon-icons.com/icons2/2845/PNG/512/linux_logo_icon_181333.png">
+                      </figure>
+                    </div>
+                  </div>
+
+                  <div class="column">
+                    <div class="list-item-content">
+                      <div class="list-item-title">Linux</div>
+                      <div class="list-item-description">Linux Foundation</div>
+                    </div>
+                  </div>
+
+                  <div class="column is-narrow">
+                    <div class="list-item-controls">
+                      <div class="buttons is-right">
+                        <button class="button" type="submit" name="vote" value="Linux">
+                          <span class="icon is-small">
+                            <i class="fas fa-edit"></i>
+                          </span>
+                          <span>投票</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+          </form>
+        </div>
+
       </div>
     </div>
-  </section>
-</form>
+  </div>
+</section>
 
 <script>
   $("#announce").delay(2000).slideUp();

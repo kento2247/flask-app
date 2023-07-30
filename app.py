@@ -198,24 +198,7 @@ def game():
         return redirect(url_for("login"))
 
     if request.method == "POST":
-        # request_valid = True
-        # selected = request.form["button"]
-        # if selected == "resist_store":
-        #     return redirect(url_for("resist_store"))
-        # elif selected == "resist_user":
-        #     return redirect(url_for("resist_user"))
-        # elif selected == "resist_transaction":
-        #     return redirect(url_for("resist_transaction"))
-        # elif selected == "show_user":
-        #     return redirect(url_for("show_user"))
-        # elif selected == "delete_user":
-        #     return redirect(url_for("delete_user"))
-        # elif selected == "delete_store":
-        #     return redirect(url_for("delete_store"))
-        # elif selected == "delete_transaction":
-        #     return redirect(url_for("delete_transaction"))
-        # else:
-        # return render_template("select_edit.html", form={})
+        # ゲーム処理
         return render_template("game.html", form={})
     else:  # GET
         return render_template("game.html", form={})
@@ -248,14 +231,12 @@ def vote():
     if request.method == "POST":
         selected = request.form["vote"]
         if selected == "Mac OS":
-            # return redirect(url_for("resist_store"))
             print("mac os")
         elif selected == "Windows":
-            # return redirect(url_for("resist_user"))
             print("windows")
         elif selected == "Linux":
-            # return redirect(url_for("resist_transaction"))
             print("linux")
+        flash(f"投票しました\n{selected}: {vote_values[selected]}→{vote_values[selected]+1}")
         db_update("VOTES", f"num={vote_values[selected]+1}", f"title='{selected}'")
 
         return redirect(url_for("vote"))

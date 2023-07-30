@@ -48,10 +48,6 @@
             <!-- メニュー部分 -->
             <div id="navbarMenu" class="navbar-menu">
                 <div class="navbar-end">
-                    <a class="navbar-item" href="{{url_for('home')}}">
-                        <i class="fas fa-home"></i>&nbsp;
-                        ホーム
-                    </a>
                     <!-- ログイン状況に応じて項目を変化 -->
                     {% if session['user_id'] %}
                     <a class="navbar-item" href="{{url_for('game')}}">
