@@ -6,10 +6,10 @@ let dlabel = String(document.getElementById("chart_labels").value);
 let larr = dlabel.split(",");
 let ctx = document.getElementById("myChart").getContext("2d");
 
-console.log(title);
-console.log(target);
-console.log(darr);
-console.log(larr);
+// console.log(title);
+// console.log(target);
+// console.log(darr);
+// console.log(larr);
 let max_y = Math.max(...darr);
 let step_y = Math.ceil(max_y / 5);
 
@@ -35,18 +35,8 @@ let myRadarChart = new Chart(ctx, {
   },
   options: {
     responsive: true,
-    // title: {
-    //   // タイトル
-    //   display: true, // 表示する
-    //   fontSize: 20, // タイトルのフォント
-    //   text: title, //app.pyのchart_title
-    // },
     legend: {
       display: false,
-      //   position: "bottom", // 凡例の表示位置
-      //   labels: {
-      //     fontSize: 20, // 判例のフォントサイズ
-      //   },
     },
     scales: {
       yAxes: [

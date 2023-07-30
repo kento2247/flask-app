@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((response) => response.json()) // レスポンスをJSON形式で解析
       .then((data) => {
         // サーバーからのデータ（JSON）を取得して処理
-        console.log(data); // 例：{'message': '逃れた時間を受け取りました。'}
+        // console.log(data); // 例：{'message': '逃れた時間を受け取りました。'}
         gameHistoryData = data["json"];
         displayLeaderboard();
       })
