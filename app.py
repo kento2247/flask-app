@@ -233,7 +233,7 @@ def logout():  # ログアウト処理
 def game():  # ゲーム画面の表示
     if "user_id" not in session:  # ログインしていない場合
         return redirect(url_for("login"))  # ログイン画面に移動する
-    return render_template("game.html", form={})  # (GETリクエストの場合)ゲーム画面を表示する
+    return render_template("game.html")  # (GETリクエストの場合)ゲーム画面を表示する
 
 
 @app.route("/save_escape_time", methods=["POST"])  # ゲームデータをセーブするエンドポイント。POST=ゲームデータを記録
@@ -242,17 +242,7 @@ def save_escape_time():  # ゲームデータをセーブする処理
     escape_time = data["escapeTime"]  # ゲームの逃れた時間を取得
     history = db_get_json("GAMELOGS", "")  # データベースからゲームデータの履歴を取得
 
-    if history == []:  # データベースに履歴がない場合
-        db_insert(
-            "GAMELOGS", {"username": session["user_id"], "time": escape_time}
-        )  # データベースにゲームデータを新規で追加する
-        history.append(
-            {"username": session["user_id"], "time": escape_time}
-        )  # JavaScriptに返す用にhistoryに追加
-        return jsonify(
-            {"message": "insert: 逃れた時間を受け取りました。", "json": history}
-        )  # JavaScriptに結果を返す
-    else:  # データベースに履歴が既にある場合(複数行のユーザー別履歴がある)
+    if len(history) > 0:  # データベースに履歴が既にある場合(複数行のユーザー別履歴がある)
         for i in history:  # それぞれの履歴を確認する
             if i["username"] == session["user_id"]:  # ログイン中のユーザーと同じユーザー名の履歴がある場合
                 if float(i["time"]) < float(escape_time):  # 履歴にある逃れた時間が、新しい結果より短い場合
@@ -273,6 +263,7 @@ def save_escape_time():  # ゲームデータをセーブする処理
                     return jsonify(
                         {"message": "none: 逃れた時間を受け取りました。", "json": history}
                     )  # 何もゲームデータ履歴を変更せず、JavaScriptに結果を返す
+
         # ログイン中のユーザーと同じユーザー名の履歴がない場合
         db_insert(
             "GAMELOGS", {"username": session["user_id"], "time": escape_time}
@@ -282,6 +273,17 @@ def save_escape_time():  # ゲームデータをセーブする処理
         )  # JavaScriptに返す用にhistoryに追加
         return jsonify(
             {"insert: message": "逃れた時間を受け取りました。", "json": history}
+        )  # JavaScriptに結果を返す
+
+    else:  # データベースに履歴がない場合
+        db_insert(
+            "GAMELOGS", {"username": session["user_id"], "time": escape_time}
+        )  # データベースにゲームデータを新規で追加する
+        history.append(
+            {"username": session["user_id"], "time": escape_time}
+        )  # JavaScriptに返す用にhistoryに追加
+        return jsonify(
+            {"message": "insert: 逃れた時間を受け取りました。", "json": history}
         )  # JavaScriptに結果を返す
 
 
