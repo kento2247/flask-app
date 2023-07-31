@@ -156,7 +156,12 @@ def login():  # ログインページへアクセスがあった時の処理
     if "user_id" in session:  # セッションにuser_idがある場合、ログイン済みなのでホーム画面にリダイレクトする
         return redirect(url_for("home"))
 
-    if request.method == "POST":  # ログインエンドポイントにPOSTリクエストがあった時。すなわちログインボタンが押された場合
+    if request.method == "GET":  # ログインエンドポイントにGETリクエストがあった時。すなわちログインページを表示したい場合
+        return render_template(
+            "login.html", error=None
+        )  # ログイン画面が欲しいというGETリクエストがあった場合、ログイン画面を返す
+
+    elif request.method == "POST":  # ログインエンドポイントにPOSTリクエストがあった時。すなわちログインボタンが押された場合
         username = request.form["username"]  # フォームの内容を取得する
         password = request.form["password"]  # フォームの内容を取得する
         h = hashlib.md5(password.encode())  # パスワードは平文ではなくハッシュ値で暗号化する
@@ -172,10 +177,6 @@ def login():  # ログインページへアクセスがあった時の処理
             session["user_id"] = username  # ユーザ認証された場合、セッションに記録する
             flash("Logged in")  # flashメッセージを設定する（簡易的なポップアップ通知）
             return redirect(url_for("home"))  # ホーム画面に戻る
-    elif request.method == "GET":
-        return render_template(
-            "login.html", error=None
-        )  # ログイン画面が欲しいというGETリクエストがあった場合、ログイン画面を返す
 
 
 @app.route(
@@ -183,7 +184,11 @@ def login():  # ログインページへアクセスがあった時の処理
 )  # サインアップエンドポイント。GET=サインアップページを表示。POST=サインアップ処理
 def signup():  # ユーザー登録のためのページ
     request_valid = True  # フォームの内容を取得し、バリデーションを行うためのフラグ
-    if request.method == "POST":  # ユーザー登録ボタンが押された場合
+
+    if request.method == "GET":  # サインアップエンドポイントにGETリクエストがあった時。すなわちサインアップページを表示したい場合
+        return render_template("signup.html")  # GETリクエストがあった場合、サインアップ画面を返す
+
+    elif request.method == "POST":  # ユーザー登録ボタンが押された場合
         username = request.form["username"]  # フォームの内容を取得する
         password = request.form["password"]  # フォームの内容を取得する
         confirm = request.form["confirm"]  # フォームの内容を取得する
@@ -196,7 +201,11 @@ def signup():  # ユーザー登録のためのページ
         if password != confirm:  # パスワードと確認用のパスワードが一致しない場合、エラーメッセージを表示する
             flash("確認用のパスワードが一致しません")
             request_valid = False
-        if request_valid:  # フォームの入力に問題がなかった場合
+
+        if request_valid == False:  # フォームの入力に問題があった場合
+            return render_template("signup.html")
+
+        else:  # フォームの入力に問題がなかった場合
             result = db_get_json(
                 "", f"SELECT * FROM USERS u WHERE u.username='{username}'"
             )  # USERSテーブルから、usernameが一致するユーザーを取得する
@@ -211,22 +220,20 @@ def signup():  # ユーザー登録のためのページ
                 }  # 登録する内容をまとめる
                 db_insert("USERS", data_obj)  # データベースにユーザー情報を追加する
                 return redirect(url_for("login"))  # ログインページにリダイレクトする
-    elif request.method == "GET":
-        return render_template("signup.html")  # GETリクエストがあった場合、サインアップ画面を返す
 
 
 @app.route("/logout")  # ログアウトエンドポイント。リクエストの種類に関わらずログアウト処理を行う
 def logout():  # ログアウト処理
     if session.pop("user_id", None):  # セッションからユーザーIDを削除する
         flash("ログアウトしました")  # flashメッセージを設定する（簡易的なポップアップ通知）
-    return redirect(url_for("home"))  # ログアウト後はホームにリダイレクトする
+    return redirect(url_for("home"))  # ログアウト後はホームにリダイレクトする。
 
 
 @app.route("/game", methods=["GET"])  # ゲームエンドポイント。GET=ゲーム画面を表示
 def game():  # ゲーム画面の表示
     if "user_id" not in session:  # ログインしていない場合
         return redirect(url_for("login"))  # ログイン画面に移動する
-    return render_template("game.html", form={})  # (GETリクエストの場合)ゲーム画面を表示する
+    return render_template("game.html")  # (GETリクエストの場合)ゲーム画面を表示する
 
 
 @app.route("/save_escape_time", methods=["POST"])  # ゲームデータをセーブするエンドポイント。POST=ゲームデータを記録
@@ -235,17 +242,7 @@ def save_escape_time():  # ゲームデータをセーブする処理
     escape_time = data["escapeTime"]  # ゲームの逃れた時間を取得
     history = db_get_json("GAMELOGS", "")  # データベースからゲームデータの履歴を取得
 
-    if history == []:  # データベースに履歴がない場合
-        db_insert(
-            "GAMELOGS", {"username": session["user_id"], "time": escape_time}
-        )  # データベースにゲームデータを新規で追加する
-        history.append(
-            {"username": session["user_id"], "time": escape_time}
-        )  # JavaScriptに返す用にhistoryに追加
-        return jsonify(
-            {"message": "insert: 逃れた時間を受け取りました。", "json": history}
-        )  # JavaScriptに結果を返す
-    else:  # データベースに履歴が既にある場合(複数行のユーザー別履歴がある)
+    if len(history) > 0:  # データベースに履歴が既にある場合(複数行のユーザー別履歴がある)
         for i in history:  # それぞれの履歴を確認する
             if i["username"] == session["user_id"]:  # ログイン中のユーザーと同じユーザー名の履歴がある場合
                 if float(i["time"]) < float(escape_time):  # 履歴にある逃れた時間が、新しい結果より短い場合
@@ -266,6 +263,7 @@ def save_escape_time():  # ゲームデータをセーブする処理
                     return jsonify(
                         {"message": "none: 逃れた時間を受け取りました。", "json": history}
                     )  # 何もゲームデータ履歴を変更せず、JavaScriptに結果を返す
+
         # ログイン中のユーザーと同じユーザー名の履歴がない場合
         db_insert(
             "GAMELOGS", {"username": session["user_id"], "time": escape_time}
@@ -277,13 +275,24 @@ def save_escape_time():  # ゲームデータをセーブする処理
             {"insert: message": "逃れた時間を受け取りました。", "json": history}
         )  # JavaScriptに結果を返す
 
+    else:  # データベースに履歴がない場合
+        db_insert(
+            "GAMELOGS", {"username": session["user_id"], "time": escape_time}
+        )  # データベースにゲームデータを新規で追加する
+        history.append(
+            {"username": session["user_id"], "time": escape_time}
+        )  # JavaScriptに返す用にhistoryに追加
+        return jsonify(
+            {"message": "insert: 逃れた時間を受け取りました。", "json": history}
+        )  # JavaScriptに結果を返す
+
 
 @app.route("/vote", methods=["GET", "POST"])  # 投票エンドポイント。GET=投票ページを返す。POST=投票処理を行う
 def vote():  # 投票画面の表示と、投票処理
     if "user_id" not in session:  # ログインしていない場合
         return redirect(url_for("login"))  # ログイン画面に移動する
 
-    # グラフ描画用のデータをデータベースから取得する
+    # グラフ描画用のデータをデータベースから取得する。編集前（現在）の投票データ
     labels = ""  # グラフのラベル
     values = ""  # グラフの値
     result = db_get_json("VOTES", "")  # データベースから投票結果を取得
@@ -296,27 +305,28 @@ def vote():  # 投票画面の表示と、投票処理
         vote_values[title] = num  # 辞書に追加
     labels = labels[:-1]  # 最後のカンマを削除
     values = values[:-1]  # 最後のカンマを削除
-    graph_data = {  # グラフ表示用のデータ。JavaScriptに送るために整形している
+    graph_data = {  # グラフ表示用のデータ。JavaScriptに送るためにObject形式に整形している
         "chart_labels": labels,
         "chart_data": values,
         "chart_title": "",
         "chart_target": "",
     }
 
-    if request.method == "POST":  # POSTリクエストがあった場合。すなわち投票があった場合
-        selected = request.form["vote"]  # どの投票項目が選択されたかを取得
+    if request.method == "GET":  # GETリクエストがあった場合。投票画面を表示するだけ
+        return render_template(
+            "vote.html", form={}, graph_data=graph_data
+        )  # グラフ表示用のデータとともに投票ページを表示する
+
+    elif request.method == "POST":  # POSTリクエストがあった場合。すなわち投票があった場合
+        selected = request.form["vote"]  # どの投票ボタンが選択されたかを取得
         flash(
             f"投票しました\n{selected}: {vote_values[selected]}→{vote_values[selected]+1}"
-        )  # 投票完了のメッセージを送る
+        )  # 投票完了のメッセージを送る。投票処理後なのでvote_values[selected]+1を表示。
         db_update(
             "VOTES", f"num={vote_values[selected]+1}", f"title='{selected}'"
         )  # 選択された投票項目の投票数を1増やす
 
         return redirect(url_for("vote"))  # voteエンドポイントにGETリダイレクトする(こうすることで画面の再描画が楽に行える)
-    elif request.method == "GET":  # GET。投票画面を表示するだけ
-        return render_template(
-            "vote.html", form={}, graph_data=graph_data
-        )  # グラフ表示用のデータとともに投票ページを表示する
 
 
 if __name__ == "__main__":
