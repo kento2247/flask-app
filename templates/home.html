@@ -21,8 +21,7 @@
       </div>
       <div class="message-body">
         {% if session['user_id'] %} Hello, {{username}}! {% else %}
-        <a href="{{url_for('login')}}">ここをクリック</a
-        >してログインをしてください {% endif %}
+        <a href="{{url_for('login')}}">ここをクリック</a>してログインをしてください {% endif %}
       </div>
     </article>
   </div>
