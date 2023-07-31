@@ -26,7 +26,7 @@ def get_db():  # DATABASEへ接続する
 
 
 def db_insert(table, data_obj):  # データベースにデータを挿入する
-    # data_obj={key:value, key:value, ...}の形式でデータを渡す
+    # data_obj={key:value, key:value, ...} の形式でデータを渡す
     conn = get_db()
     cur = conn.cursor()
     query_str = f"INSERT INTO {table} ("
