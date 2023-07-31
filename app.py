@@ -292,7 +292,7 @@ def vote():  # 投票画面の表示と、投票処理
     if "user_id" not in session:  # ログインしていない場合
         return redirect(url_for("login"))  # ログイン画面に移動する
 
-    # グラフ描画用のデータをデータベースから取得する
+    # グラフ描画用のデータをデータベースから取得する。編集前（現在）の投票データ
     labels = ""  # グラフのラベル
     values = ""  # グラフの値
     result = db_get_json("VOTES", "")  # データベースから投票結果を取得
@@ -305,27 +305,28 @@ def vote():  # 投票画面の表示と、投票処理
         vote_values[title] = num  # 辞書に追加
     labels = labels[:-1]  # 最後のカンマを削除
     values = values[:-1]  # 最後のカンマを削除
-    graph_data = {  # グラフ表示用のデータ。JavaScriptに送るために整形している
+    graph_data = {  # グラフ表示用のデータ。JavaScriptに送るためにObject形式に整形している
         "chart_labels": labels,
         "chart_data": values,
         "chart_title": "",
         "chart_target": "",
     }
 
-    if request.method == "POST":  # POSTリクエストがあった場合。すなわち投票があった場合
-        selected = request.form["vote"]  # どの投票項目が選択されたかを取得
+    if request.method == "GET":  # GETリクエストがあった場合。投票画面を表示するだけ
+        return render_template(
+            "vote.html", form={}, graph_data=graph_data
+        )  # グラフ表示用のデータとともに投票ページを表示する
+
+    elif request.method == "POST":  # POSTリクエストがあった場合。すなわち投票があった場合
+        selected = request.form["vote"]  # どの投票ボタンが選択されたかを取得
         flash(
             f"投票しました\n{selected}: {vote_values[selected]}→{vote_values[selected]+1}"
-        )  # 投票完了のメッセージを送る
+        )  # 投票完了のメッセージを送る。投票処理後なのでvote_values[selected]+1を表示。
         db_update(
             "VOTES", f"num={vote_values[selected]+1}", f"title='{selected}'"
         )  # 選択された投票項目の投票数を1増やす
 
         return redirect(url_for("vote"))  # voteエンドポイントにGETリダイレクトする(こうすることで画面の再描画が楽に行える)
-    elif request.method == "GET":  # GET。投票画面を表示するだけ
-        return render_template(
-            "vote.html", form={}, graph_data=graph_data
-        )  # グラフ表示用のデータとともに投票ページを表示する
 
 
 if __name__ == "__main__":
