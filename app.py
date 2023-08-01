@@ -259,21 +259,22 @@ def save_escape_time():  # ゲームデータをセーブする処理
                             "json": history,
                         }
                     )  # JavaScriptに結果を返す
-                else:  # 履歴にある逃れた時間が、新しい結果より長い場合
-                    return jsonify(
-                        {"message": "none: 逃れた時間を受け取りました。", "json": history}
-                    )  # 何もゲームデータ履歴を変更せず、JavaScriptに結果を返す
 
-        # ログイン中のユーザーと同じユーザー名の履歴がない場合
-        db_insert(
-            "GAMELOGS", {"username": session["user_id"], "time": escape_time}
-        )  # 新規でデータベースに履歴を追加する
-        history.append(
-            {"username": session["user_id"], "time": escape_time}
-        )  # JavaScriptに返す用にhistoryに追加
-        return jsonify(
-            {"insert: message": "逃れた時間を受け取りました。", "json": history}
-        )  # JavaScriptに結果を返す
+                # 履歴にある逃れた時間が、新しい結果より長い場合
+                return jsonify(
+                    {"message": "none: 逃れた時間を受け取りました。", "json": history}
+                )  # 何もゲームデータ履歴を変更せず、JavaScriptに結果を返す
+        else:
+            # ログイン中のユーザーと同じユーザー名の履歴がない場合
+            db_insert(
+                "GAMELOGS", {"username": session["user_id"], "time": escape_time}
+            )  # 新規でデータベースに履歴を追加する
+            history.append(
+                {"username": session["user_id"], "time": escape_time}
+            )  # JavaScriptに返す用にhistoryに追加
+            return jsonify(
+                {"insert: message": "逃れた時間を受け取りました。", "json": history}
+            )  # JavaScriptに結果を返す
 
     else:  # データベースに履歴がない場合
         db_insert(
